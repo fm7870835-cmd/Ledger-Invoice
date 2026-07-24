@@ -27,12 +27,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, user 
   return (
     <>
       {/* Desktop Sidebar (The Spine) */}
-      <aside className="hidden lg:flex flex-col h-screen w-[280px] bg-[#0c1b34] border-r border-[#ddc0be]/30 fixed left-0 top-0 z-40 select-none">
+      <aside className="hidden lg:flex flex-col h-screen w-[280px] bg-black border-r border-[#ddc0be]/30 fixed left-0 top-0 z-40 select-none">
         <div className="p-8">
           <span className="font-headline-lg text-headline-lg text-[#ffdad7] uppercase tracking-wider block">
             Ledger
           </span>
-          <span className="font-data-sm text-[10px] text-[#394761] uppercase tracking-widest mt-1 block">
+          <span className="font-data-sm text-[10px] text-gray-400 uppercase tracking-widest mt-1 block">
             AI Bookkeeping Engine
           </span>
         </div>
@@ -46,8 +46,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, user 
                 onClick={() => handleNav(item.id)}
                 className={`w-full flex items-center gap-4 py-4 px-6 text-left transition-all duration-200 cursor-pointer ${
                   isActive
-                    ? 'bg-white/10 text-white border-l-4 border-[#822426] font-semibold'
-                    : 'text-[#394761] hover:text-white hover:bg-white/5'
+                    ? 'bg-white/15 text-white border-l-4 border-[#822426] font-semibold'
+                    : 'text-gray-400 hover:text-white hover:bg-white/10'
                 }`}
               >
                 <span className="material-symbols-outlined text-[22px]">{item.icon}</span>
@@ -67,7 +67,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, user 
             </div>
             <div className="flex flex-col min-w-0">
               <span className="text-white text-xs font-bold truncate">{user.name}</span>
-              <span className="text-[#394761] text-[10px] uppercase tracking-tighter truncate">
+              <span className="text-gray-400 text-[10px] uppercase tracking-tighter truncate">
                 {user.role}
               </span>
             </div>
@@ -76,7 +76,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, user 
       </aside>
 
       {/* Mobile Top AppBar */}
-      <header className="flex lg:hidden justify-between items-center px-4 py-3 w-full z-50 fixed top-0 left-0 bg-[#0c1b34] shadow-sm text-white border-b border-[#ddc0be]/20">
+      <header className="flex lg:hidden justify-between items-center px-4 py-3 w-full z-50 fixed top-0 left-0 bg-black shadow-sm text-white border-b border-[#ddc0be]/20">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -96,7 +96,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, user 
 
       {/* Mobile Drawer Menu Overlay */}
       {mobileOpen && (
-        <div className="lg:hidden fixed inset-0 z-40 bg-[#0c1b34] pt-16 flex flex-col justify-between">
+        <div className="lg:hidden fixed inset-0 z-40 bg-black pt-16 flex flex-col justify-between">
           <nav className="p-4 space-y-2">
             {navItems.map((item) => {
               const isActive = activeTab === item.id;
@@ -106,8 +106,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, user 
                   onClick={() => handleNav(item.id)}
                   className={`w-full flex items-center gap-4 p-4 text-left rounded transition-colors ${
                     isActive
-                      ? 'bg-white/10 text-white border-l-4 border-[#822426]'
-                      : 'text-[#394761] hover:text-white'
+                      ? 'bg-white/15 text-white border-l-4 border-[#822426]'
+                      : 'text-gray-400 hover:text-white'
                   }`}
                 >
                   <span className="material-symbols-outlined">{item.icon}</span>
@@ -123,7 +123,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, user 
               </div>
               <div className="flex flex-col">
                 <span className="text-white text-sm font-bold">{user.name}</span>
-                <span className="text-[#394761] text-xs">{user.role}</span>
+                <span className="text-gray-400 text-xs">{user.role}</span>
               </div>
             </div>
           </div>
