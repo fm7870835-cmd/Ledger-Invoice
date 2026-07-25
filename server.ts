@@ -36,6 +36,12 @@ async function startServer() {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
+  // Google Search Console verification file endpoint
+  app.get('/google802d6a4bf427395b.html', (req, res) => {
+    res.setHeader('Content-Type', 'text/html');
+    res.send('google-site-verification: google802d6a4bf427395b.html');
+  });
+
   // Extract Invoice API Endpoint using Gemini 3.6 Flash
   app.post('/api/extract-invoice', async (req, res) => {
     try {
