@@ -1,6 +1,13 @@
 import { useState, useEffect } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from './lib/firebase';
+import {
+  saveInvoiceToFirestore,
+  saveMultipleInvoicesToFirestore,
+  saveUserProfileToFirestore,
+  subscribeToInvoices,
+  subscribeToUserProfile,
+} from './lib/firebaseService';
 import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './components/Dashboard';
 import { CreateInvoice } from './components/CreateInvoice';
@@ -25,32 +32,58 @@ export default function App() {
   );
   const [isReviewing, setIsReviewing] = useState(false);
 
-  // Firebase Auth listener
+  // Firebase Auth & Firestore Listener
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (fbUser) => {
       setCurrentUser(fbUser);
       if (fbUser) {
-        setUser((prev) => ({
-          ...prev,
-          email: fbUser.email || prev.email,
-          name: fbUser.displayName || fbUser.email?.split('@')[0] || prev.name,
-        }));
+        const updatedProfile = {
+          ...user,
+          email: fbUser.email || user.email,
+          name: fbUser.displayName || fbUser.email?.split('@')[0] || user.name,
+        };
+        setUser(updatedProfile);
+        saveUserProfileToFirestore(updatedProfile, fbUser.uid);
       }
     });
-    return () => unsubscribe();
+
+    // Subscribe to Firestore Real-time Invoices
+    const unsubscribeInvoices = subscribeToInvoices((firestoreInvoices) => {
+      if (firestoreInvoices && firestoreInvoices.length > 0) {
+        setInvoices(firestoreInvoices);
+      }
+    });
+
+    // Subscribe to Firestore Real-time User Profile
+    const unsubscribeProfile = subscribeToUserProfile((firestoreUser) => {
+      if (firestoreUser) {
+        setUser(firestoreUser);
+      }
+    });
+
+    return () => {
+      unsubscribeAuth();
+      unsubscribeInvoices();
+      unsubscribeProfile();
+    };
   }, []);
 
   // Modals
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
 
-  // Handlers
+  // Handlers with Firestore Persistence
   const handleInvoiceCreated = (newInvoice: Invoice) => {
     setInvoices((prev) => [newInvoice, ...prev]);
-    setUser((prev) => ({
-      ...prev,
-      invoices_processed_this_month: prev.invoices_processed_this_month + 1,
-    }));
+    const updatedUser = {
+      ...user,
+      invoices_processed_this_month: user.invoices_processed_this_month + 1,
+    };
+    setUser(updatedUser);
+
+    // Save to Firebase Firestore
+    saveInvoiceToFirestore(newInvoice);
+    saveUserProfileToFirestore(updatedUser, currentUser?.uid);
   };
 
   const handleInvoicesExtracted = (newInvoices: Invoice[]) => {
@@ -58,11 +91,20 @@ export default function App() {
     if (newInvoices.length > 0) {
       setSelectedInvoice(newInvoices[0]);
     }
+    // Save extracted invoices to Firebase Firestore
+    saveMultipleInvoicesToFirestore(newInvoices);
   };
 
   const handleUpdateInvoice = (updated: Invoice) => {
     setInvoices((prev) => prev.map((inv) => (inv.id === updated.id ? updated : inv)));
     setSelectedInvoice(updated);
+    // Save updated invoice to Firebase Firestore
+    saveInvoiceToFirestore(updated);
+  };
+
+  const handleUpdateUserProfile = (updatedUser: UserProfile) => {
+    setUser(updatedUser);
+    saveUserProfileToFirestore(updatedUser, currentUser?.uid);
   };
 
   const handleNextInvoice = () => {
@@ -81,11 +123,13 @@ export default function App() {
   };
 
   const handleSelectPlan = (plan: PlanTier, limit: number) => {
-    setUser((prev) => ({
-      ...prev,
+    const updatedUser = {
+      ...user,
       plan,
       monthly_limit: limit,
-    }));
+    };
+    setUser(updatedUser);
+    saveUserProfileToFirestore(updatedUser, currentUser?.uid);
   };
 
   return (
@@ -168,7 +212,7 @@ export default function App() {
           ) : activeTab === 'settings' ? (
             <Settings
               user={user}
-              onUpdateUser={setUser}
+              onUpdateUser={handleUpdateUserProfile}
               onOpenUpgrade={() => setIsUpgradeOpen(true)}
             />
           ) : activeTab === 'signup' ? (

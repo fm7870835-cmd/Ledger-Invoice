@@ -1,0 +1,41 @@
+{
+  "entities": {
+    "Invoice": {
+      "title": "Invoice",
+      "description": "Stores invoice details and extraction state",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "invoice_number": { "type": "string" },
+        "vendor_name": { "type": "string" },
+        "status": { "type": "string" },
+        "total_amount": { "type": "number" },
+        "issue_date": { "type": "string" },
+        "due_date": { "type": "string" }
+      },
+      "required": ["id", "invoice_number", "vendor_name", "status"]
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Stores user account settings and plan details",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "company_name": { "type": "string" },
+        "role": { "type": "string" },
+        "plan": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "invoices/{invoiceId}": {
+      "schema": { "$ref": "#/entities/Invoice" },
+      "description": "Collection of invoices"
+    },
+    "users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Collection of user profiles"
+    }
+  }
+}
