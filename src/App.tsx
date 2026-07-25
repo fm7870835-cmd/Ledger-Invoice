@@ -1,25 +1,44 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { onAuthStateChanged, User } from 'firebase/auth';
+import { auth } from './lib/firebase';
 import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './components/Dashboard';
 import { CreateInvoice } from './components/CreateInvoice';
 import { Upload } from './components/Upload';
 import { Review } from './components/Review';
 import { Settings } from './components/Settings';
+import { SignUp } from './components/SignUp';
 import { ExportModal } from './components/ExportModal';
 import { UpgradeModal } from './components/UpgradeModal';
 import { SAMPLE_INVOICES, INITIAL_USER_PROFILE } from './data/initialInvoices';
 import { Invoice, UserProfile, PlanTier } from './types';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'create' | 'upload' | 'invoices' | 'settings'>(
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'create' | 'upload' | 'invoices' | 'settings' | 'signup'>(
     'dashboard'
   );
   const [invoices, setInvoices] = useState<Invoice[]>(SAMPLE_INVOICES);
   const [user, setUser] = useState<UserProfile>(INITIAL_USER_PROFILE);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(
     SAMPLE_INVOICES.find((i) => i.status === 'Needs Review') || SAMPLE_INVOICES[0]
   );
   const [isReviewing, setIsReviewing] = useState(false);
+
+  // Firebase Auth listener
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
+      setCurrentUser(fbUser);
+      if (fbUser) {
+        setUser((prev) => ({
+          ...prev,
+          email: fbUser.email || prev.email,
+          name: fbUser.displayName || fbUser.email?.split('@')[0] || prev.name,
+        }));
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Modals
   const [isExportOpen, setIsExportOpen] = useState(false);
@@ -151,6 +170,14 @@ export default function App() {
               user={user}
               onUpdateUser={setUser}
               onOpenUpgrade={() => setIsUpgradeOpen(true)}
+            />
+          ) : activeTab === 'signup' ? (
+            <SignUp
+              currentUser={currentUser}
+              onNavigateDashboard={() => {
+                setIsReviewing(false);
+                setActiveTab('dashboard');
+              }}
             />
           ) : null}
         </div>

@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { UserProfile } from '../types';
 
 interface SidebarProps {
-  activeTab: 'dashboard' | 'create' | 'upload' | 'invoices' | 'settings';
-  setActiveTab: (tab: 'dashboard' | 'create' | 'upload' | 'invoices' | 'settings') => void;
+  activeTab: 'dashboard' | 'create' | 'upload' | 'invoices' | 'settings' | 'signup';
+  setActiveTab: (tab: 'dashboard' | 'create' | 'upload' | 'invoices' | 'settings' | 'signup') => void;
   user: UserProfile;
   onOpenUpgrade?: () => void;
 }
@@ -16,10 +16,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, user 
     { id: 'create' as const, label: 'Create Invoice', icon: 'add_notes' },
     { id: 'upload' as const, label: 'Upload Invoice', icon: 'upload_file' },
     { id: 'invoices' as const, label: 'Invoices', icon: 'description' },
+    { id: 'signup' as const, label: 'Sign Up / Auth', icon: 'person_add' },
     { id: 'settings' as const, label: 'Settings', icon: 'settings' },
   ];
 
-  const handleNav = (tab: 'dashboard' | 'create' | 'upload' | 'invoices' | 'settings') => {
+  const handleNav = (tab: 'dashboard' | 'create' | 'upload' | 'invoices' | 'settings' | 'signup') => {
     setActiveTab(tab);
     setMobileOpen(false);
   };
